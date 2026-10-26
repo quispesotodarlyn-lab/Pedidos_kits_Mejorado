@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pedidos de kits de robótica | SENATI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='logo_senati.png') }}" alt="SENATI">
+    <div>
+      <strong>Machine Learning y Deep Learning</strong>
+      <p>Caso práctico: regresión lineal múltiple</p>
+    </div>
+  </header>
+
+  <main>
+    <h1>¿Cuántos kits de robótica se pedirán esta semana?</h1>
+    <p>Ingresa los datos de la semana y pulsa «Calcular» para obtener una estimación de pedidos.</p>
+
+    <!-- POST envía al servidor el contenido del formulario. -->
+    <form method="POST">
+      <label for="consultas_web">Consultas web de la semana (de {{ rangos.consultas_web[0] }} a {{ rangos.consultas_web[1] }})</label>
+      <input id="consultas_web" type="number" name="consultas_web"
+             min="{{ rangos.consultas_web[0] }}" max="{{ rangos.consultas_web[1] }}"
+             step="1" required value="{{ escritos.consultas_web }}"
+             placeholder="Por ejemplo, 20">
+
+      <label for="inversion_publicidad_soles">Inversión en publicidad (S/ {{ rangos.inversion_publicidad_soles[0] }} a S/ {{ rangos.inversion_publicidad_soles[1] }})</label>
+      <input id="inversion_publicidad_soles" type="number" name="inversion_publicidad_soles"
+             min="{{ rangos.inversion_publicidad_soles[0] }}" max="{{ rangos.inversion_publicidad_soles[1] }}"
+             step="any" required value="{{ escritos.inversion_publicidad_soles }}"
+             placeholder="Por ejemplo, 200">
+
+      <label for="campana_escolar">¿Hay campaña escolar esta semana?</label>
+      <select id="campana_escolar" name="campana_escolar">
+        <option value="0" {% if escritos.campana_escolar == '0' %}selected{% endif %}>No (0)</option>
+        <option value="1" {% if escritos.campana_escolar == '1' %}selected{% endif %}>Sí (1)</option>
+      </select>
+
+      <button type="submit">Calcular</button>
+    </form>
+
+    {% if resultado %}
+      <section class="resultado">
+        <p>Pedidos estimados para la semana</p>
+        <strong>{{ resultado.pedidos }} kits</strong>
+        <small>Valor calculado: {{ resultado.exacto }} · Rango probable: {{ resultado.minimo }} a {{ resultado.maximo }} kits</small>
+      </section>
+    {% endif %}
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <section class="detalle">
+      <h2>Qué tan confiable es</h2>
+      <p>En los datos de prueba, el modelo se equivocó en promedio por <strong>{{ '%.1f'|format(mae) }} pedidos</strong> (MAE)
+         y explicó el <strong>{{ '%.0f'|format(r2 * 100) }}%</strong> de la variación de los pedidos (R² = {{ '%.2f'|format(r2) }}).</p>
+    </section>
+
+    <p class="aviso">Práctica con datos simulados. Es una estimación: no garantiza los pedidos reales y puede fallar si la semana es muy distinta a las del entrenamiento (feriados, cambios de precio, otros competidores).</p>
+  </main>
+  <footer>Material de taller · SENATI</footer>
+</body>
+</html>
